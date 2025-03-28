@@ -1,0 +1,13 @@
+-- 테이블에서 리뷰를 가장 많이 작성한 회원의 리뷰들을 조회하는 SQL문을 작성해주세요.
+-- 리뷰작성일 기준 오름차순, 리뷰텍스트 기준 오름차순
+SELECT MP.MEMBER_NAME, RP.REVIEW_TEXT, DATE_FORMAT(RP.REVIEW_DATE, '%Y-%m-%d') AS REVIEW_DATE
+FROM REST_REVIEW AS RP
+JOIN MEMBER_PROFILE AS MP ON RP.MEMBER_ID = MP.MEMBER_ID
+WHERE RP.MEMBER_ID = (    
+            SELECT MEMBER_ID
+            FROM REST_REVIEW
+            GROUP BY MEMBER_ID
+            ORDER BY COUNT(*) DESC
+            LIMIT 1 
+)
+ORDER BY RP.REVIEW_DATE ASC, RP.REVIEW_TEXT ASC;
