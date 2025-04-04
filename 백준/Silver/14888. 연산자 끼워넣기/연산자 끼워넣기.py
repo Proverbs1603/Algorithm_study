@@ -1,40 +1,45 @@
-#백준 14888 문제
-#예제 
-# 2
-# 5 6
-# 0 0 1 0
-from itertools import permutations
 N = int(input())
-data = list(map(int, input().split()))
-op_list = ['+', '-', '*', '/']
-num_operator = list(map(int, input().split()))
-op = []
+numbers = list(map(int, input().split()))
 
-#연산자 갯수만큼 +, -, *, / 를 op리스트에 넣어주기
-for k in range(len(num_operator)):
-    for _ in range(num_operator[k]):
-        op.append(op_list[k])
+add, minus, multi, div = map(int, input().split())
 
-maximum = -1e9
-minimum = 1e9
+# dfs를 활용한 완전탐색
+min_value = 1e9 + 1
+max_value = -1e9 - 1
 
-def solve():
-    global maximum, minimum
-    for case in permutations(op, N-1):
-        total = data[0]
-        for r in range(1,N):
-            if case[r-1] == '+':
-                total += data[r]
-            elif case[r-1] == '-':
-                total -= data[r]
-            elif case[r-1] == '*':
-                total *= data[r]
-            elif case[r-1] == '/':
-                total = int(total/data[r])
-            
-        maximum = max(total, maximum)
-        minimum = min(total, minimum)
+def dfs(value, depth):
+    global add, minus, multi, div, min_value, max_value
+    
+    if depth == N:    
+        min_value = min(min_value, value)
+        max_value = max(max_value, value)
+    else:
+        
+        if add > 0:
+            add -= 1
+            dfs(value+numbers[depth], depth+1)
+            add += 1
+        
+        if minus > 0:
+            minus -= 1
+            dfs(value-numbers[depth], depth+1)
+            minus += 1
+        
+        if multi > 0:
+            multi -= 1
+            dfs(value*numbers[depth], depth+1)
+            multi += 1
+        
+        # 음수를 양수로 나눌 때는 C++14의 기준을 따른다. 즉, 양수로 바꾼 뒤 몫을 취하고, 그 몫을 음수로 바꾼 것과 같다. 이에 따라서, 위의 식 4개의 결과를 계산해보면 아래와 같다.
+        if div > 0:
+            div -= 1
+            if value < 0:
+                new_value = -(-value // numbers[depth])
+            else:
+                new_value = value // numbers[depth]
+            dfs(new_value, depth+1)
+            div += 1
 
-solve()
-print(maximum)
-print(minimum)
+dfs(numbers[0], 1)
+print(max_value)
+print(min_value)
